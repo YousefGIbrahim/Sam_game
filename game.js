@@ -1,79 +1,100 @@
-
-var buttonColours = ["red", "blue", "green", "yellow"];
-
+// Game variables
+var buttonColors = ["red", "blue", "green", "yellow"];
 var gamePattern = [];
 var userClickedPattern = [];
-
-var started = false;
+var gameStarted = false;
 var level = 0;
 
-$(document).keypress(function() {
-  if (!started) {
-    $("#level-title").text("Level " + level);
-    nextSequence();
-    started = true;
+// Start/Restart button functionality
+$("#start-restart-btn").click(function() {
+  if (!gameStarted) {
+    startGame();
+  } else {
+    restartGame();
   }
 });
 
-$(".btn").click(function() {
-
-  var userChosenColour = $(this).attr("id");
-  userClickedPattern.push(userChosenColour);
-
-  playSound(userChosenColour);
-  animatePress(userChosenColour);
-
-  checkAnswer(userClickedPattern.length-1);
-});
-
-function checkAnswer(currentLevel) {
-
-    if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
-      if (userClickedPattern.length === gamePattern.length){
-        setTimeout(function () {
-          nextSequence();
-        }, 1000);
-      }
-    } else {
-      playSound("wrong");
-      $("body").addClass("game-over");
-      $("#level-title").text("Game Over, Press Any Key to Restart");
-
-      setTimeout(function () {
-        $("body").removeClass("game-over");
-      }, 200);
-
-      startOver();
-    }
+// Start game function
+function startGame() {
+  gameStarted = true;
+  level = 0;
+  gamePattern = [];
+  $("#level-title").text("Level " + level);
+  nextSequence();
 }
 
+// Restart game function
+function restartGame() {
+  gameStarted = false;
+  userClickedPattern = [];
+  startGame();
+}
 
+// Generates the next color in the sequence
 function nextSequence() {
   userClickedPattern = [];
   level++;
   $("#level-title").text("Level " + level);
-  var randomNumber = Math.floor(Math.random() * 4);
-  var randomChosenColour = buttonColours[randomNumber];
-  gamePattern.push(randomChosenColour);
 
-  $("#" + randomChosenColour).fadeIn(100).fadeOut(100).fadeIn(100);
-  playSound(randomChosenColour);
+  // Select a random color and add it to the game pattern
+  var randomChosenColor = buttonColors[Math.floor(Math.random() * 4)];
+  gamePattern.push(randomChosenColor);
+
+  // Flash the button for the chosen color
+  $("#" + randomChosenColor).fadeIn(100).fadeOut(100).fadeIn(100);
+
+  // Play sound for the chosen color
+  playSound(randomChosenColor);
 }
 
-function animatePress(currentColor) {
-  $("#" + currentColor).addClass("pressed");
-  setTimeout(function () {
-    $("#" + currentColor).removeClass("pressed");
-  }, 100);
+// Handles user button clicks
+$(".btn").click(function() {
+  if (gameStarted) {
+    var userChosenColor = $(this).attr("id");
+    userClickedPattern.push(userChosenColor);
+
+    // Play sound and animate the clicked button
+    playSound(userChosenColor);
+    animatePress(userChosenColor);
+
+    // Check the user's answer
+    checkAnswer(userClickedPattern.length - 1);
+  }
+});
+
+// Checks the user's answer
+function checkAnswer(currentLevel) {
+  if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
+    // If the user has matched the full sequence, generate the next color
+    if (userClickedPattern.length === gamePattern.length) {
+      setTimeout(function() {
+        nextSequence();
+      }, 1000);
+    }
+  } else {
+    // Game over sequence
+    playSound("wrong");
+    $("body").addClass("game-over");
+    $("#level-title").text("Game Over, Press Start/Restart");
+
+    setTimeout(function() {
+      $("body").removeClass("game-over");
+    }, 200);
+
+    gameStarted = false;
+  }
 }
 
+// Plays sound for the corresponding color
 function playSound(name) {
   var audio = new Audio("sounds/" + name + ".mp3");
   audio.play();
 }
 
-function startOver() {
-  level = 0;
-  gamePattern = [];
-  started = false;
+// Animates button press
+function animatePress(currentColor) {
+  $("#" + currentColor).addClass("pressed");
+  setTimeout(function() {
+    $("#" + currentColor).removeClass("pressed");
+  }, 100);
 }
