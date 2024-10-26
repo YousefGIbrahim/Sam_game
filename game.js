@@ -19,15 +19,18 @@ function startGame() {
   gameStarted = true;
   level = 0;
   gamePattern = [];
+  $("#start-restart-btn").text("Restart Game");  // Change button text
   $("#level-title").text("Level " + level);
   nextSequence();
 }
 
 // Restart game function
 function restartGame() {
-  gameStarted = false;
+  level = 0;
+  gamePattern = [];
   userClickedPattern = [];
-  startGame();
+  $("#level-title").text("Level " + level);
+  nextSequence();
 }
 
 // Generates the next color in the sequence
@@ -75,13 +78,14 @@ function checkAnswer(currentLevel) {
     // Game over sequence
     playSound("wrong");
     $("body").addClass("game-over");
-    $("#level-title").text("Game Over, Press Start/Restart");
+    $("#level-title").text("Game Over, Press Restart");
 
     setTimeout(function() {
       $("body").removeClass("game-over");
     }, 200);
 
     gameStarted = false;
+    $("#start-restart-btn").text("Restart Game");  // Change button text to "Restart Game"
   }
 }
 
